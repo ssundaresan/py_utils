@@ -1,6 +1,9 @@
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+import numpy as np
+import sys
+import os
 
 ax1 = None
 ax2 = None
@@ -11,7 +14,7 @@ ax2 = None
 #       xarr is optional. if not passed, it uses the index of the yarr points as the x-axis 
 # ptype can be "plot" or "scatter"
 # cnt - integer between 0 and 11, to choose the line and marker style.
-#       this is optional. use if you're using multiple lines in same plot, and call the plotter in a loop
+#       this is optional. use if you're using multiple lines in same plot
 # color - optional. black by default.
 # mfreq - optional. frequency of markers. default is 10 per plot
 # axis - optional. 'ax1' or 'ax2'. Use only if using multiple y-axis * currently not supported *
@@ -62,11 +65,6 @@ def plot_cdf(xarr=[],yarr=[],file=None,cnt=0,color='k',axis='ax1'):
   #p = ax.plot(xarr,yarr,color=color,linewidth=3,linestyle=ls[cnt])[0]
   return p 
 
-#### To plot histogram
-#	yarr = array of similar data
-#	width = width of the bar, wrt to the total width=1
-#	cnt = increment this if sending in multiple arrays in loop
-
 def plot_hist(yarr,width,ncol=1,cnt=0):
   htch = ['/','**','..','++','x','o','\\','||','oo','//']
   #if width == None:
@@ -78,9 +76,6 @@ def plot_hist(yarr,width,ncol=1,cnt=0):
   print y,cnt,left
   p = plt.bar(left,y,width,hatch=htch[cnt],color='w',ecolor='k')
   return p 
-
-#### To plot histogram
-#	initial attempt - all input parameters same as for "boxplot" command
 
 def plot_box(arr,notch=0,sym='+',vert=1,whis=1.5,positions=None):
   bp = plt.boxplot(arr,notch=notch,sym=sym,vert=vert,whis=whis,positions=positions)
@@ -100,7 +95,8 @@ def legend(leg=None,p=None,fn=None,loc='best',axis='ax1',clear=True):
     ax = ax1
   if leg != None and p != None:
     ax.legend(p,leg,loc=loc)
-  plt.savefig(fn)
+  if fn != None:
+    plt.savefig(fn)
   if clear == True:
     plt.clf()
 
