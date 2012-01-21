@@ -35,12 +35,12 @@ def plot_ts(xarr=None,yarr=None,yerr=None,ptype='plot',cnt=0,color='k',mfreq=0,a
   #print markerfreq
   if ptype == 'plot':
     if xarr == None:
-        #p = ax.plot(yarr,color=color,linestyle=ls[cnt],marker=marker[cnt],markevery=markerfreq)[0]
-        p = ax.plot(yarr,color=color,linestyle=ls[cnt],linewidth=3)[0]
+        p = ax.plot(yarr,color=color,linestyle=ls[cnt],marker=marker[cnt],markevery=markerfreq)[0]
+        #p = ax.plot(yarr,color=color,linestyle=ls[cnt],linewidth=3)[0]
     else:
         if yerr == None:
-          p = ax.plot(xarr,yarr,color=color,linestyle=ls[cnt],linewidth=3)[0]
-          #p = ax.plot(xarr,yarr,color=color,linestyle=ls[cnt],marker=marker[cnt],markevery=markerfreq)[0]
+          #p = ax.plot(xarr,yarr,color=color,linestyle=ls[cnt],linewidth=3)[0]
+          p = ax.plot(xarr,yarr,color=color,linestyle=ls[cnt],marker=marker[cnt],markevery=markerfreq)[0]
         else:
           #p = ax.errorbar(xarr,yarr,yerr=yerr,color=color,linestyle=ls[cnt],marker=marker[cnt])[0]
           p = ax.errorbar(xarr,yarr,yerr=yerr,color=color)[0]
@@ -63,21 +63,27 @@ def plot_cdf(xarr=[],yarr=[],file=None,cnt=0,color='k',axis='ax1'):
   markerfreq = len(yarr)/10  
   p = ax.plot(xarr,yarr,color=color,linestyle=ls[cnt],marker=marker[cnt],markevery=markerfreq)[0]
   #p = ax.plot(xarr,yarr,color=color,linewidth=3,linestyle=ls[cnt])[0]
+  del xarr
+  del yarr
   return p 
 
-def plot_hist(yarr,width,ncol=1,cnt=0):
+def plot_hist(yarr,width,yerr=None,col=1,cnt=0):
   htch = ['/','**','..','++','x','o','\\','||','oo','//']
   #if width == None:
   #  width = (0.8*ncol)/len(yarr)
   p = []
   y = yarr
   x = np.arange(0,len(y))
-  left = np.array(x)*ncol + cnt*width 
-  print y,cnt,left
+  left = np.array(x)*col + cnt*width 
+  #print y,cnt,left
   p = plt.bar(left,y,width,hatch=htch[cnt],color='w',ecolor='k')
+  if yerr != None:
+    yerr = np.array(yerr)/2
+    plt.errorbar(left+width/2,np.array(yarr)+np.array(yerr),fmt=None,yerr=yerr,ecolor='k')
+    
   return p 
 
-def plot_box(arr,notch=0,sym='+',vert=1,whis=1.5,positions=None):
+def plot_box(arr,notch=0,sym='+',vert=1,whis=1.5,positions=None,widths=0.75):
   bp = plt.boxplot(arr,notch=notch,sym=sym,vert=vert,whis=whis,positions=positions)
   return bp
 
@@ -219,3 +225,6 @@ def annotate(x,y,xt,yt,t):
   for i in range(0,len(x)):
     ax1.annotate(t[i],(x[i],y[i]),xytext=(xt[i],yt[i]),arrowprops=dict(arrowstyle='->')) 
 
+def text(xarr,yarr,tarr,fontsize=12):
+  for i in range(0,len(xarr)):
+    ax1.text(xarr[i],yarr[i],tarr[i],fontsize=fontsize,horizontalalignment='center')
