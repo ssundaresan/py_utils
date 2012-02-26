@@ -21,7 +21,8 @@ ax2 = None
 # linewidth - optional. 0.5 by default
 #### 
 
-def plot_ts(xarr=None,yarr=None,yerr=None,ptype='plot',cnt=0,color='k',mfreq=0,axis='ax1',linewidth=0.5,markersize=25):
+def plot_ts(xarr=None,yarr=None,yerr=None,ptype='plot',cnt=0,color=False,mfreq=0,axis='ax1',linewidth=0.5,markersize=25):
+  colors = ['r','b','g','y','k']
   if axis == 'ax2':
     ax = ax2
   else:
@@ -35,40 +36,53 @@ def plot_ts(xarr=None,yarr=None,yerr=None,ptype='plot',cnt=0,color='k',mfreq=0,a
   #print markerfreq
   if ptype == 'plot':
     if xarr == None:
-        p = ax.plot(yarr,color=color,linestyle=ls[cnt],marker=marker[cnt],markevery=markerfreq)[0]
-        #p = ax.plot(yarr,color=color,linestyle=ls[cnt],linewidth=3)[0]
+        if color == False:
+          p = ax.plot(yarr,color='k',linestyle=ls[cnt],marker=marker[cnt],markevery=markerfreq)[0]
+        else:
+          p = ax.plot(yarr,color=colors[cnt],linestyle=ls[cnt],linewidth=3)[0]
     else:
         if yerr == None:
-          #p = ax.plot(xarr,yarr,color=color,linestyle=ls[cnt],linewidth=3)[0]
-          p = ax.plot(xarr,yarr,color=color,linestyle=ls[cnt],marker=marker[cnt],markevery=markerfreq)[0]
+          if color == False:
+            p = ax.plot(xarr,yarr,color='k',linestyle=ls[cnt],marker=marker[cnt],markevery=markerfreq)[0]
+          else:
+            p = ax.plot(xarr,yarr,color=colors[cnt],linestyle=ls[cnt],linewidth=3)[0]
         else:
-          #p = ax.errorbar(xarr,yarr,yerr=yerr,color=color,linestyle=ls[cnt],marker=marker[cnt])[0]
-          p = ax.errorbar(xarr,yarr,yerr=yerr,color=color)[0]
+          if color == False:
+            p = ax.errorbar(xarr,yarr,yerr=yerr,color='k',linestyle=ls[cnt],marker=marker[cnt])[0]
+          else:
+            p = ax.errorbar(xarr,yarr,yerr=yerr,colors=color[cnt])[0]
   if ptype == 'scatter':
     marker = ['x','o','d','+']
-    p = ax.scatter(xarr,yarr,marker=marker[cnt],color=color,linewidth=linewidth,s=markersize)
+    if color == False:
+      p = ax.scatter(xarr,yarr,marker=marker[cnt],color='k',linewidth=linewidth,s=markersize)
+    else:
+      p = ax.scatter(xarr,yarr,marker=marker[cnt],color=colors[cnt],linewidth=linewidth,s=markersize)
   return p 
 
 #### To plot CDFs.
 #    Same as plot_ts, except xarr is not optional
 
-def plot_cdf(xarr=[],yarr=[],file=None,cnt=0,color='k',axis='ax1'):
+def plot_cdf(xarr=[],yarr=[],file=None,cnt=0,color=False,axis='ax1'):
   if axis == 'ax2':
     ax = ax2
   else:
     ax = ax1
   ls = ['-','--','-.',':','-','--','-.',':','-','--','-.',':']
   marker = ['o','*','^','1','2','3','4','o','*','^','1','^']
+  colors = ['r','b','g','y','k']
 
   markerfreq = len(yarr)/10  
-  p = ax.plot(xarr,yarr,color=color,linestyle=ls[cnt],marker=marker[cnt],markevery=markerfreq)[0]
-  #p = ax.plot(xarr,yarr,color=color,linewidth=3,linestyle=ls[cnt])[0]
+  if color == False:
+    p = ax.plot(xarr,yarr,color='k',linestyle=ls[cnt],marker=marker[cnt],markevery=markerfreq)[0]
+  else:
+    p = ax.plot(xarr,yarr,color=colors[cnt],linewidth=3,linestyle=ls[cnt])[0]
   del xarr
   del yarr
   return p 
 
-def plot_hist(yarr,width,yerr=None,col=1,cnt=0):
+def plot_hist(yarr,width,yerr=None,col=1,cnt=0,color=False):
   htch = ['/','**','..','++','x','o','\\','||','oo','//']
+  colors = ['r','b','g','y','k']
   #if width == None:
   #  width = (0.8*ncol)/len(yarr)
   p = []
@@ -76,7 +90,10 @@ def plot_hist(yarr,width,yerr=None,col=1,cnt=0):
   x = np.arange(0,len(y))
   left = np.array(x)*col + cnt*width 
   #print y,cnt,left
-  p = plt.bar(left,y,width,hatch=htch[cnt],color='w',ecolor='k')
+  if color == False:
+    p = plt.bar(left,y,width,hatch=htch[cnt],color='w',ecolor='k')
+  else:
+    p = plt.bar(left,y,width,color=colors[cnt])
   if yerr != None:
     yerr = np.array(yerr)/2
     plt.errorbar(left+width/2,np.array(yarr)+np.array(yerr),fmt=None,yerr=yerr,ecolor='k')
@@ -94,13 +111,13 @@ def plot_box(arr,notch=0,sym='+',vert=1,whis=1.5,positions=None,widths=0.75):
 # loc - optional; upper-left by default
 # axis - optional; same as in plot_ts * currently not supported *
 
-def legend(leg=None,p=None,fn=None,loc='best',axis='ax1',clear=True):
+def legend(leg=None,p=None,fn=None,loc='best',axis='ax1',fs='large',ncol=1,clear=True):
   if axis == 'ax2':
     ax = ax2
   else:
     ax = ax1
   if leg != None and p != None:
-    ax.legend(p,leg,loc=loc)
+    ax.legend(p,leg,loc=loc,prop=dict(size=fs),ncol=ncol)
   if fn != None:
     plt.savefig(fn)
   if clear == True:
