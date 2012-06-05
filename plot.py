@@ -89,7 +89,7 @@ def plot_hist(yarr,width,yerr=None,col=1,cnt=0,color=False):
   y = yarr
   x = np.arange(0,len(y))
   left = np.array(x)*col + cnt*width 
-  #print y,cnt,left
+  print y,cnt,left
   if color == False:
     p = plt.bar(left,y,width,hatch=htch[cnt],color='w',ecolor='k')
   else:
@@ -161,7 +161,7 @@ def figsize(l,h,axes=None):
 # grid - 'True','False','x', or 'y'. default - true
 # fn - if given, it will save and ***clear the current figure***
 
-def figstuff(log=None,xlabel=None,ylabel=None,xlim=None,ylim=None,xticks=None,yticks=None,hline=None,vline=None,title=None,fn=None,axis='ax1',grid=True):
+def figstuff(log=None,xlabel=None,ylabel=None,xlim=None,ylim=None,xticks=None,yticks=None,hline=None,vline=None,title=None,fn=None,axis='ax1',grid=True,xha=None,xva=None,xrotation=None):
   if axis == 'ax2':
     ax = ax2
   else:
@@ -186,7 +186,10 @@ def figstuff(log=None,xlabel=None,ylabel=None,xlim=None,ylim=None,xticks=None,yt
       ax.set_xticklabels(xticks[0],size='large')
     else:
       ax.set_xticks(xticks[0])
-      ax.set_xticklabels(xticks[1],size='large')
+      if xrotation == None:
+        ax.set_xticklabels(xticks[1],size='large')
+      else:
+        ax.set_xticklabels(xticks[1],size='large',ha=xha,va=xva,rotation=xrotation)
   #else:
   #  plt.xticks([])
   if yticks != None:
