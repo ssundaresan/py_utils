@@ -4,9 +4,16 @@ import matplotlib.pyplot as plt
 import numpy as np
 import sys
 import os
+matplotlib.rc('text', usetex=True)
+matplotlib.rc('font', **{'family':'serif', 'sans-serif': ['Times'], 'size': 9})
+matplotlib.rc('axes', linewidth=0.5)
+matplotlib.rc('patch', linewidth=0.5)
+matplotlib.rc('lines', linewidth=0.5)
+matplotlib.rc('grid', linewidth=0.25)
 
 ax1 = None
 ax2 = None
+fig = None
 
 #### Plot time series (or just about anything) ####
 # Function returns reference to the plotted line
@@ -33,7 +40,8 @@ def plot_ts(xarr=None,yarr=None,yerr=None,ptype='plot',cnt=0,color=False,mfreq=0
   if mfreq == 0:
     mfreq = len(yarr)
   markerfreq = len(yarr)/mfreq  
-  #print markerfreq
+  markerfreq = (int(np.random.uniform()*markerfreq),markerfreq)
+  print markerfreq
   if ptype == 'plot':
     if xarr == None:
         if color == False:
@@ -52,7 +60,7 @@ def plot_ts(xarr=None,yarr=None,yerr=None,ptype='plot',cnt=0,color=False,mfreq=0
           else:
             p = ax.errorbar(xarr,yarr,yerr=yerr,colors=color[cnt])[0]
   if ptype == 'scatter':
-    marker = ['x','o','d','+']
+    marker = ['x','o','d','+','.']
     if color == False:
       p = ax.scatter(xarr,yarr,marker=marker[cnt],color='k',linewidth=linewidth,s=markersize)
     else:
@@ -80,20 +88,25 @@ def plot_cdf(xarr=[],yarr=[],file=None,cnt=0,color=False,axis='ax1'):
   del yarr
   return p 
 
-def plot_hist(yarr,width,yerr=None,col=1,cnt=0,color=False):
+def plot_hist(yarr,width,yerr=None,bottom=None,col=1,cnt=0,color=False,stack=False):
   htch = ['/','**','..','++','x','o','\\','||','oo','//']
   colors = ['r','b','g','y','k']
   #if width == None:
   #  width = (0.8*ncol)/len(yarr)
+  if bottom == None:
+    bottom = [0] * len(yarr)
   p = []
   y = yarr
   x = np.arange(0,len(y))
-  left = np.array(x)*col + cnt*width 
+  if stack == False:
+    left = np.array(x)*col + cnt*width 
+  else:
+    left = np.array(x)*col
   print y,cnt,left
   if color == False:
-    p = plt.bar(left,y,width,hatch=htch[cnt],color='w',ecolor='k')
+    p = plt.bar(left,y,width,bottom=bottom,hatch=htch[cnt],color='w',ecolor='k')
   else:
-    p = plt.bar(left,y,width,color=colors[cnt])
+    p = plt.bar(left,y,width,bottom=bottom,color=colors[cnt])
   if yerr != None:
     yerr = np.array(yerr)/2
     plt.errorbar(left+width/2,np.array(yarr)+np.array(yerr),fmt=None,yerr=yerr,ecolor='k')
@@ -101,7 +114,7 @@ def plot_hist(yarr,width,yerr=None,col=1,cnt=0,color=False):
   return p 
 
 def plot_box(arr,notch=0,sym='+',vert=1,whis=1.5,positions=None,widths=0.75):
-  bp = plt.boxplot(arr,notch=notch,sym=sym,vert=vert,whis=whis,positions=positions)
+  bp = plt.boxplot(arr,notch=notch,sym=sym,vert=vert,whis=whis,positions=positions,widths=widths)
   return bp
 
 #### Add legends, save file
@@ -118,6 +131,7 @@ def legend(leg=None,p=None,fn=None,loc='best',axis='ax1',fs='large',ncol=1,clear
     ax = ax1
   if leg != None and p != None:
     ax.legend(p,leg,loc=loc,prop=dict(size=fs),ncol=ncol)
+  fig.tight_layout()
   if fn != None:
     plt.savefig(fn)
   if clear == True:
@@ -129,18 +143,24 @@ def legend(leg=None,p=None,fn=None,loc='best',axis='ax1',fs='large',ncol=1,clear
 # axes - optional; if you want to move around the axes, see example file
 ####
  
-def figsize(l,h,axes=None):
-  fig = plt.figure(num=1,figsize=(l,h))
+def figsize(l,h,axes=None,axid=0):
+  global fig
   global ax1
   global ax2
+  fig = plt.figure(num=1,figsize=(l,h))
   if axes != None:
-    ax1 = plt.axes(axes)
-    #ax2 = plt.twinx()
+    if axid == 0:
+      ax1 = plt.axes(axes)
+    else:
+     ax2 = plt.axes(axes)
   if axes == None:
-    ax1 = plt.subplot(111)
+    if axid == 0:
+    #ax1 = plt.subplot(111)
     #print 'ax2'
     #ax2 = plt.twinx()
-    ax1 = plt.subplot(111,axes=axes)
+      ax1 = plt.subplot(111,axes=axes)
+    else:
+      ax2 = plt.subplot(111,axes=axes)
 
 #### Add info to figure
 # All parameters are optional
@@ -183,22 +203,23 @@ def figstuff(log=None,xlabel=None,ylabel=None,xlim=None,ylim=None,xticks=None,yt
     if len(xticks) == 1:
       #print xticks
       ax.set_xticks(xticks[0])
-      ax.set_xticklabels(xticks[0],size='large')
+      ax.set_xticklabels(xticks[0])#,size='large')
     else:
       ax.set_xticks(xticks[0])
       if xrotation == None:
-        ax.set_xticklabels(xticks[1],size='large')
+        ax.set_xticklabels(xticks[1])#,size='large')
       else:
-        ax.set_xticklabels(xticks[1],size='large',ha=xha,va=xva,rotation=xrotation)
+        #ax.set_xticklabels(xticks[1],size='large',ha=xha,va=xva,rotation=xrotation)
+        ax.set_xticklabels(xticks[1],ha=xha,va=xva,rotation=xrotation)
   #else:
   #  plt.xticks([])
   if yticks != None:
     if len(yticks) == 1:
       ax.set_yticks(yticks[0])
-      ax.set_yticklabels(yticks[0],size='large')
+      ax.set_yticklabels(yticks[0])#,size='large')
     else:
       ax.set_yticks(yticks[0])
-      ax.set_yticklabels(yticks[1],size='large')
+      ax.set_yticklabels(yticks[1])#,size='large')
 
   if xlim != None:
     if xlim[0] != None:
@@ -207,21 +228,24 @@ def figstuff(log=None,xlabel=None,ylabel=None,xlim=None,ylim=None,xticks=None,yt
       ax.set_xlim(xmax=xlim[1])
 
   if ylim != None:
-    if ylim[0] == None:
-      ax.set_ylim(ymax=ylim[1])
-    elif ylim[1] == None:
+    if ylim[0] != None:
       ax.set_ylim(ymin=ylim[0])
-    else:
-      ax.set_ylim(ymin=ylim[0],ymax=ylim[1])
+    if ylim[1] != None:
+      ax.set_ylim(ymax=ylim[1])
+    #else:
+    #  ax.set_ylim(ymin=ylim[0],ymax=ylim[1])
     
   if hline != None:
     ax.axhline(y=hline)
   if vline != None:
     ax.axvline(x=vline)
 
-  #ax.ylim(ymin=10,ymax=200)
-  ax.set_xlabel(xlabel,size='large')
-  ax.set_ylabel(ylabel,size='large')
+  #ax.set_ylim(ymin=1,ymax=150000)
+  #ax.set_xlabel(xlabel,size='large',ha='center')
+  #ax.set_ylabel(ylabel,size='large',ma='center')
+  ax.set_xlabel(xlabel,ha='center',size="large")
+  ax.set_ylabel(ylabel,ma='center',size="large")
+  #ax.set_ylabel(ylabel,fontsize=30,ma='center')
   if grid == True or grid == False:
     ax.grid(grid)
   if grid == "x":
@@ -243,8 +267,13 @@ def figstuff(log=None,xlabel=None,ylabel=None,xlim=None,ylim=None,xticks=None,yt
 
 def annotate(x,y,xt,yt,t):
   for i in range(0,len(x)):
-    ax1.annotate(t[i],(x[i],y[i]),xytext=(xt[i],yt[i]),arrowprops=dict(arrowstyle='->')) 
+    ax1.annotate(t[i],(x[i],y[i]),xytext=(xt[i],yt[i]),fontsize='large',arrowprops=dict(arrowstyle='->')) 
 
 def text(xarr,yarr,tarr,fontsize=12):
   for i in range(0,len(xarr)):
-    ax1.text(xarr[i],yarr[i],tarr[i],fontsize=fontsize,horizontalalignment='center')
+    #ax1.text(xarr[i],yarr[i],tarr[i],fontsize=fontsize,horizontalalignment='center')
+    ax1.text(xarr[i],yarr[i],tarr[i],horizontalalignment='center')
+
+def circle(xy,radius):
+  c = plt.Circle(xy,radius=radius,fill=False) 
+  ax1.add_artist(c)
