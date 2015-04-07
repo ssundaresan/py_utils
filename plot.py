@@ -269,11 +269,14 @@ def annotate(x,y,xt,yt,t):
   for i in range(0,len(x)):
     ax1.annotate(t[i],(x[i],y[i]),xytext=(xt[i],yt[i]),fontsize='large',arrowprops=dict(arrowstyle='->')) 
 
-def text(xarr,yarr,tarr,fontsize=12):
+def text(xarr,yarr,tarr,fontsize=12,color='k'):
   for i in range(0,len(xarr)):
     #ax1.text(xarr[i],yarr[i],tarr[i],fontsize=fontsize,horizontalalignment='center')
-    ax1.text(xarr[i],yarr[i],tarr[i],horizontalalignment='center')
+    ax1.text(xarr[i],yarr[i],tarr[i],horizontalalignment='center',color=color)
 
 def circle(xy,radius):
   c = plt.Circle(xy,radius=radius,fill=False) 
   ax1.add_artist(c)
+
+def plot_heatmap(arr,vmin=0,vmax=1):
+  plt.pcolor(arr,cmap=plt.cm.binary,vmin=vmin,vmax=vmax); 
